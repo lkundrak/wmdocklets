@@ -8,7 +8,8 @@ pew.o: controls/*.xpm font/*.xpm
 pew.o text.o: text.h
 pew.o button.o: button.h
 pew.o frame.o: frame.h
-ui.h widget.o text.o button.o frame.o: widget.h
+pew.o ui.o: ui.h
+ui.o widget.o text.o button.o frame.o: widget.h
 
 clean:
 	rm -f pew *.o
