@@ -8,6 +8,7 @@
 #include "frame.h"
 
 #include "font/digit-small.xpm"
+#include "font/digit.xpm"
 
 #include "controls/previous.xpm"
 #include "controls/play.xpm"
@@ -34,9 +35,12 @@ main (argc, argv)
 
 	struct widget_list *widgets = NULL;
 	struct button previous, play, next, stop, eject;
-	struct frame button_frame, frame2;
-	struct text_font font;
-	struct text text1;
+	struct frame button_frame;
+	struct text_font digit_small, digit;
+	struct text artist, title;
+	struct frame artist_frame, title_frame;
+	struct text track, time;
+	struct frame track_frame, time_frame;
 
 	ui_init (argc, argv, "chuck", "Chuck", &display, &icon, &gc);
 
@@ -70,15 +74,45 @@ main (argc, argv)
 	XpmCreatePixmapFromData (display, icon, eject_xpm,
 		&eject.pixmap, NULL, NULL);
 
-	/* Test display */
-	text_font_load (display, icon, digit_small_xpm, &font);
-	widget_add (&widgets, text_create (&font, icon, gc, 2, 30, 9, &text1));
+	/* Text displays */
+	text_font_load (display, icon, digit_xpm, &digit);
+	text_font_load (display, icon, digit_small_xpm, &digit_small);
+
+	widget_add (&widgets, text_create (&digit, icon, gc,
+		4, 4, 2, &track));
 	widget_add (&widgets, frame_create (display, icon,
-		text1.widget.rectangle.x - 1,
-		text1.widget.rectangle.y - 1,
-		text1.widget.rectangle.width + 2,
-		text1.widget.rectangle.height + 2,
-		&frame2));
+		track.widget.rectangle.x - 3,
+		track.widget.rectangle.y - 3,
+		track.widget.rectangle.width + 6,
+		track.widget.rectangle.height + 6,
+		&track_frame));
+
+	widget_add (&widgets, text_create (&digit, icon, gc,
+		26, 4, 4, &time));
+	widget_add (&widgets, frame_create (display, icon,
+		time.widget.rectangle.x - 3,
+		time.widget.rectangle.y - 3,
+		time.widget.rectangle.width + 6,
+		time.widget.rectangle.height + 6,
+		&time_frame));
+
+	widget_add (&widgets, text_create (&digit_small, icon, gc,
+		2, 20, 9, &artist));
+	widget_add (&widgets, frame_create (display, icon,
+		artist.widget.rectangle.x - 1,
+		artist.widget.rectangle.y - 1,
+		artist.widget.rectangle.width + 2,
+		artist.widget.rectangle.height + 2,
+		&artist_frame));
+
+	widget_add (&widgets, text_create (&digit_small, icon, gc,
+		2, 33, 9, &title));
+	widget_add (&widgets, frame_create (display, icon,
+		title.widget.rectangle.x - 1,
+		title.widget.rectangle.y - 1,
+		title.widget.rectangle.width + 2,
+		title.widget.rectangle.height + 2,
+		&title_frame));
 
 	/* The rest is transparent */
 	widget_mask (widgets, icon);

@@ -31,6 +31,7 @@ text_create (font, window, gc, x, y, width, text)
 {
 	text->gc = gc;
 	text->font = font;
+	text->width = width;
 	text->widget.display = font->display;
 
 	/* Geometry */
@@ -65,7 +66,19 @@ text_draw (widget)
 	text = TEXT_FROM_WIDGET(widget);
 	font = text->font;
 
-	char *string = "Kurwa";
+	char *string;
+	if (TEXT_WIDTH(font) == 7) {
+		if (text->width == 2)
+			string = "01";
+		else
+			string = "2:34";
+	} else {
+		static int i = 0;
+		if (i++ % 2)
+			string = "Hello World";
+		else
+			string = "Japierdole";
+	}
 
 	for (x = 0; *string; string++) {
 		XCopyArea (widget->display, font->pixmap, widget->window,
