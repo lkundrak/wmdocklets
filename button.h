@@ -10,7 +10,7 @@ struct button
 {
 	int pushed;
 	struct widget widget;
-	Pixmap picture;
+	Pixmap pixmap;
 	widget_callback *action; 
 };
 
@@ -18,7 +18,7 @@ int
 button_draw (struct widget *);
 
 struct widget *
-button_create (Display *, Window, int, int, int, int, widget_callback *,
-	struct button *);
+button_create (Display *, Window, GC, int, int, int, int,
+	widget_callback *, struct button *);
 
 #endif

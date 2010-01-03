@@ -22,14 +22,16 @@ button_event (widget, event)
 }
 
 struct widget *
-button_create (display, window, x, y, width, height, action, button)
+button_create (display, window, gc, x, y, width, height, action, button)
 	Display *display;
 	Window window;
+	GC gc;
 	int x, y, width, height;
 	widget_callback action;
 	struct button *button;
 {
 	button->pushed = 0;
+	button->pixmap = 0;
 	button->widget.display = display;
 
 	/* Geometry */
@@ -87,10 +89,12 @@ button_draw (widget)
 		XAllocColor(display, colormap, &light);
 	}
 
+
 	/* Fill */
-	XSetForeground (display, gc, fill.pixel);
-	XSetBackground (display, gc, fill.pixel);
-	XFillRectangle (display, window, gc, 1, 1, width - 1, height - 1);
+	if (button->pixmap) {
+		XCopyArea (display, button->pixmap, window, gc,
+			0, 0, width - 1, height, 1, 1);
+	}
 
 	/* Top left */
 	XSetForeground (display, gc, (button->pushed ? dark : light).pixel);

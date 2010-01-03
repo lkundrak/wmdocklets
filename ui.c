@@ -60,6 +60,10 @@ ui_event (display, widgets, event)
 	struct widget *widget;
 
 	switch (event.type) {
+	case GraphicsExpose:
+	case NoExpose:
+		/* Ignore these */
+		break;
 	case Expose:
 		widget = widget_window (widgets, event.xexpose.window);
 		if (widget)
