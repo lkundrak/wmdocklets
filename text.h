@@ -9,9 +9,9 @@
 #define TEXT_FROM_WIDGET(w) ((struct text *)((void *)(w) - \
         (void *)&((struct text *)0)->widget))
 
-#define TEXT_WIDTH(font) (font->attrib.width / 0x100)
-#define TEXT_HEIGHT(font) (font->attrib.height)
-#define TEXT_GLYPH(font, glyph) (glyph * TEXT_WIDTH(font)), 0, \
+#define TEXT_WIDTH(font) ((font)->attrib.width / 0x100)
+#define TEXT_HEIGHT(font) ((font)->attrib.height)
+#define TEXT_GLYPH(font, glyph) ((glyph) * TEXT_WIDTH(font)), 0, \
 	TEXT_WIDTH(font), TEXT_HEIGHT(font)
 
 struct text_font {

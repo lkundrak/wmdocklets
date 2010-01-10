@@ -63,7 +63,7 @@ text_draw (widget)
 {
 	struct text *text;
 	char *string;
-	int x;
+	int i;
 
 	text = TEXT_FROM_WIDGET(widget);
 	string = text->buffer;
@@ -71,10 +71,10 @@ text_draw (widget)
 	if (!string)
 		return 0;
 
-	for (x = 0; *string; string++) {
+	for (i = 0; i < text->width; i++) {
 		XCopyArea (widget->display, text->font->pixmap, widget->window,
-			text->gc, TEXT_GLYPH(text->font, *string), x, 0);
-		x += TEXT_WIDTH(text->font);
+			text->gc, TEXT_GLYPH(text->font, *string ? *string++ : ' '),
+			i * TEXT_WIDTH(text->font), 0);
 	}
 
 	return 0;
