@@ -1,3 +1,4 @@
+#include <dbus/dbus.h>
 #include <dbus/dbus-glib.h>
 #include <id3tag.h>
 #include <string.h>
@@ -199,6 +200,7 @@ player (data)
 	guint32 elapsed;
 
 	g_type_init ();
+	dbus_threads_init_default ();
 
 	error = NULL;
 	conn = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
