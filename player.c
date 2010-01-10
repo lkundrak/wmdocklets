@@ -116,6 +116,8 @@ playingUriChanged (proxy, uri, data)
 	char *track_str;
 
 	file = id3_file_open (file_uri (uri), ID3_FILE_MODE_READONLY);
+	if (!file)
+		return;
 
 	if (title_text)
 		free (title_text);
@@ -209,14 +211,15 @@ player (data)
 		"/org/gnome/Rhythmbox/Player", "org.gnome.Rhythmbox.Player");
 
 	/* Initial settings */
-	dbus_g_proxy_call (proxy, "getElapsed", &error, G_TYPE_INVALID,
-		G_TYPE_UINT, &elapsed, G_TYPE_INVALID);
-	elapsedChanged (proxy, elapsed, NULL);
+	if (dbus_g_proxy_call (proxy, "getElapsed", &error, G_TYPE_INVALID,
+		G_TYPE_UINT, &elapsed, G_TYPE_INVALID))
+		elapsedChanged (proxy, elapsed, NULL);
 
-	dbus_g_proxy_call (proxy, "getPlayingUri", &error, G_TYPE_INVALID,
-		G_TYPE_STRING, &uri, G_TYPE_INVALID);
-	playingUriChanged (proxy, uri, NULL);
-	g_free (uri);
+	if (dbus_g_proxy_call (proxy, "getPlayingUri", &error, G_TYPE_INVALID,
+		G_TYPE_STRING, &uri, G_TYPE_INVALID)) {
+		playingUriChanged (proxy, uri, NULL);
+		g_free (uri);
+	}
 
 	/* Watch for changes */
 	dbus_g_proxy_add_signal (proxy, "elapsedChanged",
