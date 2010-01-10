@@ -48,6 +48,11 @@ ui_init (argc, argv, name, class, display, window, gc)
 	hints->icon_window = *window;
 	hints->window_group = mainwin;
 	XSetWMHints (*display, mainwin, hints);
+
+	/* ...and some other WM hints */
+	XSetCommand (*display, mainwin, argv, argc);
+	XStoreName (*display, mainwin, name);
+	XSetIconName (*display, mainwin, name);
 }
 
 /* Dispatch event to approriate widget */
