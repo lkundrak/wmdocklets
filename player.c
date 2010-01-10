@@ -9,7 +9,7 @@
 #include "widget.h"
 
 #include "player.h"
-#include "pew.h"
+#include "wmplayer.h"
 
 static char elapsed_text[5];
 static char track_text[2];
