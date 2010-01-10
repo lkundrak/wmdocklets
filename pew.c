@@ -1,11 +1,13 @@
 #include <X11/Xlib.h>
 #include <X11/xpm.h>
-#include <stdio.h>
+#include <pthread.h>
 
 #include "ui.h"
 #include "text.h"
 #include "button.h"
 #include "frame.h"
+
+#include "player.h"
 
 #include "font/digit-small.xpm"
 #include "font/digit.xpm"
@@ -16,13 +18,12 @@
 #include "controls/stop.xpm"
 #include "controls/eject.xpm"
 
-int
-meow (widget)
-	struct widget *widget;
-{
-	printf ("japierdole\n");
-	return 0;
-}
+/* Changable from backend */
+struct text artist, title;
+struct text track, elapsed;
+
+/* Don't race with xlib */
+pthread_mutex_t draw_mutex;
 
 int
 main (argc, argv)
@@ -34,13 +35,13 @@ main (argc, argv)
 	GC gc;
 
 	struct widget_list *widgets = NULL;
-	struct button previous, play, next, stop, eject;
 	struct frame button_frame;
 	struct text_font digit_small, digit;
-	struct text artist, title;
 	struct frame artist_frame, title_frame;
-	struct text track, time;
-	struct frame track_frame, time_frame;
+	struct frame track_frame, elapsed_frame;
+	struct button previous, play, next, stop, eject;
+
+	pthread_t player_thread;
 
 	ui_init (argc, argv, "chuck", "Chuck", &display, &icon, &gc);
 
@@ -88,13 +89,13 @@ main (argc, argv)
 		&track_frame));
 
 	widget_add (&widgets, text_create (&digit, icon, gc,
-		26, 4, 4, &time));
+		26, 4, 4, &elapsed));
 	widget_add (&widgets, frame_create (display, icon,
-		time.widget.rectangle.x - 3,
-		time.widget.rectangle.y - 3,
-		time.widget.rectangle.width + 6,
-		time.widget.rectangle.height + 6,
-		&time_frame));
+		elapsed.widget.rectangle.x - 3,
+		elapsed.widget.rectangle.y - 3,
+		elapsed.widget.rectangle.width + 6,
+		elapsed.widget.rectangle.height + 6,
+		&elapsed_frame));
 
 	widget_add (&widgets, text_create (&digit_small, icon, gc,
 		2, 20, 9, &artist));
@@ -117,10 +118,19 @@ main (argc, argv)
 	/* The rest is transparent */
 	widget_mask (widgets, icon);
 
+	pthread_mutex_init (&draw_mutex, NULL);
+	/* Spawn the music player back end */
+	pthread_create (&player_thread, NULL, player, NULL);
+
 	while (1) {
 		XEvent event;
 		XNextEvent (display, &event);
+		pthread_mutex_lock (&draw_mutex);
 		ui_event (display, widgets, event);
+
+		/* FIXME: Only flush if the event queue is empty */
+		XFlush (event.xany.display);
+		pthread_mutex_unlock (&draw_mutex);
 	}
 
 	return 0;

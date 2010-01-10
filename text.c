@@ -21,6 +21,7 @@ text_font_load (display, window, font_data, font)
 	return font;
 }
 
+/* Constructor */
 struct widget *
 text_create (font, window, gc, x, y, width, text)
 	struct text_font *font;
@@ -33,6 +34,7 @@ text_create (font, window, gc, x, y, width, text)
 	text->font = font;
 	text->width = width;
 	text->widget.display = font->display;
+	text->buffer = NULL;
 
 	/* Geometry */
 	text->widget.rectangle.x = x;
@@ -59,31 +61,20 @@ int
 text_draw (widget)
 	struct widget *widget;
 {
-	struct text_font *font;
 	struct text *text;
+	char *string;
 	int x;
 
 	text = TEXT_FROM_WIDGET(widget);
-	font = text->font;
+	string = text->buffer;
 
-	char *string;
-	if (TEXT_WIDTH(font) == 7) {
-		if (text->width == 2)
-			string = "01";
-		else
-			string = "2:34";
-	} else {
-		static int i = 0;
-		if (i++ % 2)
-			string = "Hello World";
-		else
-			string = "Japierdole";
-	}
+	if (!string)
+		return 0;
 
 	for (x = 0; *string; string++) {
-		XCopyArea (widget->display, font->pixmap, widget->window,
-			text->gc, TEXT_GLYPH(font, *string), x, 0);
-		x += TEXT_WIDTH(font);
+		XCopyArea (widget->display, text->font->pixmap, widget->window,
+			text->gc, TEXT_GLYPH(text->font, *string), x, 0);
+		x += TEXT_WIDTH(text->font);
 	}
 
 	return 0;

@@ -75,6 +75,4 @@ ui_event (display, widgets, event)
 			widget_event (widget, event);
 		break;
 	}
-
-	XFlush (event.xany.display);
 }

@@ -1,8 +1,16 @@
-CFLAGS += -Wall
+# Common
+CFLAGS += -Wall -g -O0
+
+# Ui
 LDFLAGS = -lXpm -lX11 -lXext
 
+# Player backend
+DEPS = glib-2.0 dbus-glib-1 id3tag
+CFLAGS += -Wall $(shell pkg-config --cflags $(DEPS))
+LDFLAGS += $(shell pkg-config --libs $(DEPS))
+
 all: pew
-pew: pew.o ui.o widget.o text.o button.o frame.o
+pew: pew.o ui.o widget.o text.o button.o frame.o player.o
 
 pew.o: controls/*.xpm font/*.xpm
 pew.o text.o: text.h
