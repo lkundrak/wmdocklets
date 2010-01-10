@@ -13,11 +13,11 @@ button_event (widget, event)
 
 	button = BUTTON_FROM_WIDGET(widget);
 	button->pushed = !button->pushed;
-	widget_draw (widget);
 
-	if (button->action)
+	if (button->action && !button->pushed)
 		button->action (widget);
 
+	widget_draw (widget);
 	return 0;
 }
 

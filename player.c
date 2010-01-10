@@ -16,6 +16,8 @@ static char track_text[2];
 static char *title_text = NULL;
 static char *artist_text = NULL;
 
+DBusGProxy *proxy;
+
 char *file_uri (uri)
 	char *uri;
 {
@@ -78,6 +80,8 @@ get_id3str (file, frame_name)
 	}
 }
 
+/* Signal callbacks */
+
 void
 elapsedChanged (proxy, secs, data)
 	DBusGProxy *proxy;
@@ -111,7 +115,6 @@ playingUriChanged (proxy, uri, data)
 	char *track_str;
 
 	file = id3_file_open (file_uri (uri), ID3_FILE_MODE_READONLY);
-	printf ("wooof! %s\n", uri);
 
 	if (title_text)
 		free (title_text);
@@ -137,13 +140,61 @@ playingUriChanged (proxy, uri, data)
 	id3_file_close (file);
 }
 
+/* UI Button callbacks */
+
+int
+previous_track (widget)
+	struct widget *widget;
+{
+	GError *error;
+
+	if (!proxy)
+		return 0;
+	error = NULL;
+	dbus_g_proxy_call (proxy, "previous", &error,
+		G_TYPE_INVALID, G_TYPE_INVALID);
+
+	return (error == NULL);
+}
+
+int
+play_pause (widget)
+	struct widget *widget;
+{
+	GError *error;
+
+	if (!proxy)
+		return 0;
+	error = NULL;
+	dbus_g_proxy_call (proxy, "playPause", &error,
+		G_TYPE_BOOLEAN, 0, G_TYPE_INVALID, G_TYPE_INVALID);
+
+	return (error == NULL);
+}
+
+int
+next_track (widget)
+	struct widget *widget;
+{
+	GError *error;
+
+	if (!proxy)
+		return 0;
+	error = NULL;
+	dbus_g_proxy_call (proxy, "next", &error,
+		G_TYPE_INVALID, G_TYPE_INVALID);
+
+	return (error == NULL);
+}
+
+/* The player backend thread loop */
+
 void *
 player (data)
 	void *data;
 {
 	GError *error;
 	DBusGConnection *conn;
-	DBusGProxy *proxy;
 	char *uri;
 	guint32 elapsed;
 

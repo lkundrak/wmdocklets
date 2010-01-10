@@ -47,11 +47,11 @@ main (argc, argv)
 
 	/* Button bar */
 	widget_add (&widgets, button_create (display, icon, gc,
-		 1, 45, 11, 11, NULL, &previous));
+		 1, 45, 11, 11, previous_track, &previous));
 	widget_add (&widgets, button_create (display, icon, gc,
-		 12, 45, 11, 11, NULL, &play));
+		 12, 45, 11, 11, play_pause, &play));
 	widget_add (&widgets, button_create (display, icon, gc,
-		 23, 45, 11, 11, NULL, &next));
+		 23, 45, 11, 11, next_track, &next));
 	widget_add (&widgets, button_create (display, icon, gc,
 		 34, 45, 11, 11, NULL, &stop));
 	widget_add (&widgets, button_create (display, icon, gc,
@@ -118,8 +118,8 @@ main (argc, argv)
 	/* The rest is transparent */
 	widget_mask (widgets, icon);
 
-	pthread_mutex_init (&draw_mutex, NULL);
 	/* Spawn the music player back end */
+	pthread_mutex_init (&draw_mutex, NULL);
 	pthread_create (&player_thread, NULL, player, NULL);
 
 	while (1) {
